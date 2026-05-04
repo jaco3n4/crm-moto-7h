@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CRM - Formation 7h Moto</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #f5f5f5;
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px;
+  }
+  .header h1 { font-size: 17px; font-weight: 700; }
+  .header .subtitle { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .stat {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+  }
+  .stat .val { font-size: 22px; font-weight: 700; }
+  .stat .lbl { font-size: 10px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.03em; margin-top: 2px; }
+  .stat.green .val { color: #059669; }
+  .stat.blue .val { color: #2563eb; }
+  .stat.purple .val { color: #7c3aed; }
+
+  .filters {
+    padding: 8px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .filters input[type="search"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #fff;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  .filter-row {
+    display: flex;
+    gap: 8px;
+  }
+  .filter-row select {
+    flex: 1;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    background: #fff;
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .list { padding: 0 12px 100px; }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .card:active { box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
+
+  .card-top {
+    padding: 14px 14px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card-info { flex: 1; min-width: 0; }
+  .card-name { font-weight: 700; font-size: 15px; }
+  .card-location { font-size: 13px; color: #6b7280; margin-top: 2px; }
+  .card-address { font-size: 12px; color: #9ca3af; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge.not_contacted { background: #f3f4f6; color: #6b7280; }
+  .badge.called { background: #ede9fe; color: #5b21b6; }
+  .badge.replied { background: #d1fae5; color: #065f46; }
+  .badge.interested { background: #dbeafe; color: #1e40af; }
+  .badge.not_interested { background: #fee2e2; color: #991b1b; }
+  .badge.no_answer { background: #fff7ed; color: #9a3412; }
+  .badge.wrong_number { background: #fce7f3; color: #9d174d; }
+  .badge.rdv_pris { background: #fef3c7; color: #92400e; }
+
+  .card-actions {
+    display: flex;
+    border-top: 1px solid #f3f4f6;
+  }
+  .card-actions button {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: background 0.1s;
+  }
+  .card-actions button:active { background: #f3f4f6; }
+  .card-actions button + button { border-left: 1px solid #f3f4f6; }
+  .card-actions .call-btn { color: #059669; }
+  .card-actions .status-btn { color: #2563eb; }
+  .card-actions .note-btn { color: #6b7280; }
+
+  .card-expanded {
+    padding: 0 14px 14px;
+    display: none;
+  }
+  .card.open .card-expanded { display: block; }
+
+  .status-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .status-picker button {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .status-picker button:active { background: #f3f4f6; }
+  .status-picker button.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+  }
+
+  .note-area {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+    background: #fafafa;
+  }
+  .note-area:focus { border-color: #2563eb; outline: none; background: #fff; }
+
+  .site-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+  }
+  .site-link:active { text-decoration: underline; }
+
+  .call-info {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #065f46;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+    font-size: 15px;
+  }
+
+  .reset-bar {
+    padding: 8px 16px 16px;
+    text-align: center;
+  }
+  .reset-bar button {
+    padding: 8px 16px;
+    border: 1px solid #fca5a5;
+    border-radius: 10px;
+    background: #fff;
+    color: #dc2626;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .reset-bar button:active { background: #fef2f2; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 100;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Formation 7h Moto</h1>
+  <div class="subtitle" id="subtitle">54 auto-ecoles · Nord de la France</div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="val" id="s-total">54</div><div class="lbl">Total</div></div>
+  <div class="stat purple"><div class="val" id="s-called">0</div><div class="lbl">Appelés</div></div>
+  <div class="stat green"><div class="val" id="s-replied">0</div><div class="lbl">Répondu</div></div>
+  <div class="stat blue"><div class="val" id="s-interested">0</div><div class="lbl">Intéressé</div></div>
+</div>
+
+<div class="filters">
+  <input type="search" id="search" placeholder="Rechercher une auto-école, ville…" autocomplete="off">
+  <div class="filter-row">
+    <select id="filter-status">
+      <option value="">Tous statuts</option>
+      <option value="not_contacted">Non contacté</option>
+      <option value="called">Appelé</option>
+      <option value="replied">A répondu</option>
+      <option value="interested">Intéressé</option>
+      <option value="not_interested">Pas intéressé</option>
+      <option value="no_answer">Ne répond pas</option>
+      <option value="wrong_number">Faux numéro</option>
+      <option value="rdv_pris">RDV pris</option>
+    </select>
+    <select id="filter-zone">
+      <option value="">Tous depts</option>
+      <option value="51">Marne (51)</option>
+      <option value="59">Nord (59)</option>
+      <option value="62">Pas-de-Calais (62)</option>
+      <option value="80">Somme (80)</option>
+      <option value="02">Aisne (02)</option>
+      <option value="60">Oise (60)</option>
+    </select>
+  </div>
+</div>
+
+<div class="list" id="list"></div>
+
+<div class="reset-bar">
+  <button onclick="resetState()">Réinitialiser tous les statuts</button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const CONTACTS = [
+  {id:1, nom:"Auto-Ecole du Jard", tel:"03 26 07 25 87", ville:"Reims", dpt:"51", adresse:"72 rue du Jard, 51100 Reims", site:"https://www.autoecole-dujard.com/"},
+  {id:2, nom:"Auto-Ecole Petit", tel:"03 26 84 11 33", ville:"Reims", dpt:"51", adresse:"246 bis avenue de Laon, 51100 Reims", site:""},
+  {id:3, nom:"Marius Formation", tel:"03 26 07 09 25", ville:"Reims", dpt:"51", adresse:"41 rue de Verdun, 51100 Reims", site:""},
+  {id:4, nom:"Auto-Ecole Pommery", tel:"03 26 07 44 00", ville:"Reims", dpt:"51", adresse:"74 boulevard Pommery, 51100 Reims", site:""},
+  {id:5, nom:"Auto-Ecole des Sacres", tel:"03 52 45 09 32", ville:"Reims", dpt:"51", adresse:"6 rue du Barbâtre, 51100 Reims", site:"https://www.permis-reims.fr/"},
+  {id:6, nom:"Auto-Ecole Tissier", tel:"03 26 09 63 12", ville:"Reims", dpt:"51", adresse:"3 ter Avenue Clémenceau, 51100 Reims", site:"https://www.autoecole-tissier.com/"},
+  {id:7, nom:"Auto-Ecole Fausten", tel:"03 26 50 85 85", ville:"Reims", dpt:"51", adresse:"4 Place Martyrs de la Résistance, 51100 Reims", site:"https://autoecolefausten.com/"},
+  {id:8, nom:"Auto-Ecole Hémicycle Centre", tel:"03 26 68 32 88", ville:"Châlons-en-Champagne", dpt:"51", adresse:"15 Rue Saint Dominique, 51000 Châlons-en-Champagne", site:""},
+  {id:9, nom:"Pilote Auto Ecole", tel:"03 26 64 10 14", ville:"Châlons-en-Champagne", dpt:"51", adresse:"47 Rue Carnot, 51000 Châlons-en-Champagne", site:""},
+  {id:10, nom:"Auto-école des Belvas", tel:"03 26 32 44 10", ville:"Épernay", dpt:"51", adresse:"12 rue Eugène Mercier, 51200 Épernay", site:"https://www.auto-ecole-belvas.fr/"},
+  {id:11, nom:"Auto-école Malakoff", tel:"03 26 54 40 49", ville:"Épernay", dpt:"51", adresse:"6 place Malakoff, 51200 Épernay", site:""},
+  {id:12, nom:"ECF Fauquet Hervé", tel:"03 20 74 55 70", ville:"Lille", dpt:"59", adresse:"17 rue Jean Sans Peur, 59000 Lille", site:""},
+  {id:13, nom:"Lille Conduite Métropole", tel:"03 20 42 97 06", ville:"Lille", dpt:"59", adresse:"159 rue du Faubourg de Roubaix, 59000 Lille", site:"https://www.lille-conduite-metropole.fr/"},
+  {id:14, nom:"Ozone Formation La Madeleine", tel:"03 20 13 01 23", ville:"La Madeleine", dpt:"59", adresse:"44 rue du Général de Gaulle, 59110 La Madeleine", site:"https://www.ozone-formation.com/"},
+  {id:15, nom:"Ozone Formation Lesquin", tel:"03 20 85 73 09", ville:"Lesquin", dpt:"59", adresse:"1 place Haine Saint Pierre, 59810 Lesquin", site:"https://www.ozone-formation.com/"},
+  {id:16, nom:"Ozone Formation Roncq", tel:"03 62 57 48 10", ville:"Roncq", dpt:"59", adresse:"305 rue de Lille, 59223 Roncq", site:"https://www.ozone-formation.com/"},
+  {id:17, nom:"Auto Moto Ecole du Château", tel:"03 20 56 37 91", ville:"Villeneuve-d'Ascq", dpt:"59", adresse:"196 Rue Jules Guesde, 59650 Villeneuve-d'Ascq", site:""},
+  {id:18, nom:"Jouffroy Formation Roubaix", tel:"03 20 56 47 50", ville:"Roubaix", dpt:"59", adresse:"122 Rue de Tourcoing, 59100 Roubaix", site:"https://www.jouffroy-formation.com/"},
+  {id:19, nom:"Ecole de Conduite Le Pallec", tel:"03 20 76 85 45", ville:"Tourcoing", dpt:"59", adresse:"183 Rue de Gand, 59200 Tourcoing", site:"https://ecole-conduite-lepallec.com/"},
+  {id:20, nom:"Stych Auto-École Tourcoing", tel:"03 20 27 82 97", ville:"Tourcoing", dpt:"59", adresse:"35-37 Rue Nationale, 59200 Tourcoing", site:""},
+  {id:21, nom:"Leader Conduite", tel:"03 20 36 06 85", ville:"Tourcoing", dpt:"59", adresse:"48 Rue de Tournai, 59200 Tourcoing", site:""},
+  {id:22, nom:"CER Val Gare", tel:"03 27 29 82 29", ville:"Valenciennes", dpt:"59", adresse:"26 avenue du Maréchal de Lattre de Tassigny, 59300 Valenciennes", site:"https://www.val-gare.fr/"},
+  {id:23, nom:"Auto-Ecole Lubek Douai", tel:"03 27 87 35 08", ville:"Douai", dpt:"59", adresse:"529 avenue du Maréchal Leclerc, 59500 Douai", site:"https://www.auto-ecole-lubek.com/"},
+  {id:24, nom:"ECF Douai", tel:"03 27 91 21 88", ville:"Douai", dpt:"59", adresse:"114 rue de la Mairie, 59500 Douai", site:""},
+  {id:25, nom:"Auto-école Laborde Douai", tel:"03 27 98 98 99", ville:"Douai", dpt:"59", adresse:"", site:"https://www.auto-ecole-laborde.com/"},
+  {id:26, nom:"Auto-Ecole I.C.F", tel:"03 27 83 72 39", ville:"Cambrai", dpt:"59", adresse:"12 rue des Feutriers, 59400 Cambrai", site:"https://www.auto-ecole-icf.com/"},
+  {id:27, nom:"Auto-Ecole Jean-Paul", tel:"03 27 81 15 39", ville:"Cambrai", dpt:"59", adresse:"4 place Maurice Schuman, 59400 Cambrai", site:"https://www.autoecole-jeanpaul.fr/"},
+  {id:28, nom:"Auto-école Laborde Cambrai", tel:"03 27 81 10 96", ville:"Cambrai", dpt:"59", adresse:"23 rue de Lille, 59400 Cambrai", site:"https://www.auto-ecole-laborde.com/"},
+  {id:29, nom:"Auto-École Poincaré", tel:"03 28 63 01 80", ville:"Dunkerque", dpt:"59", adresse:"9 Rue du Président Poincaré, 59140 Dunkerque", site:"https://www.poincare-autoecole.com/"},
+  {id:30, nom:"City'Zen Gael Lens", tel:"09 83 86 30 81", ville:"Lens", dpt:"62", adresse:"3 Avenue de Varsovie, 62300 Lens", site:"https://www.city-zen-nord.fr/"},
+  {id:31, nom:"RCFT Arras", tel:"03 21 57 70 97", ville:"Arras", dpt:"62", adresse:"Rue Hanz Geiger ZI Est, 62000 Arras", site:""},
+  {id:32, nom:"Centre de Formation RCFT Béthune", tel:"03 21 57 70 97", ville:"Béthune", dpt:"62", adresse:"495 rue Franklin Delano Roosevelt, 62400 Béthune", site:""},
+  {id:33, nom:"City'Zen Gael Béthune", tel:"09 83 86 31 74", ville:"Béthune", dpt:"62", adresse:"31 rue Eugène Haynaut, 62400 Béthune", site:"https://www.city-zen-nord.fr/"},
+  {id:34, nom:"Auto-Ecole Sylviane", tel:"03 21 68 94 05", ville:"Béthune", dpt:"62", adresse:"638 Rue de Lille, 62400 Béthune", site:""},
+  {id:35, nom:"CER Devemy", tel:"03 21 88 80 81", ville:"Saint-Omer", dpt:"62", adresse:"91 Rue de Calais, 62500 Saint-Omer", site:""},
+  {id:36, nom:"ECA Ecole de Conduite Audomaroise", tel:"09 83 52 00 72", ville:"Saint-Omer", dpt:"62", adresse:"12 rue d'Arras, 62500 Saint-Omer", site:"https://www.eca-autoecole.fr/"},
+  {id:37, nom:"Fun Conduite Calais", tel:"03 21 17 44 78", ville:"Calais", dpt:"62", adresse:"Chemin des Régniers, 62100 Calais", site:"https://www.funconduite-calais.fr/"},
+  {id:38, nom:"Auto-école des Victoires", tel:"03 21 31 58 34", ville:"Boulogne-sur-Mer", dpt:"62", adresse:"", site:"https://autoecoledesvictoires.fr/"},
+  {id:39, nom:"Auto-Ecole Audruicq", tel:"06 80 92 65 82", ville:"Audruicq", dpt:"62", adresse:"180 rue Edmond Dupont, 62370 Audruicq", site:"https://www.auto-ecole-daudruicq.fr/"},
+  {id:40, nom:"Rousselle Auto Ecole", tel:"03 22 92 20 76", ville:"Amiens", dpt:"80", adresse:"9 Rue de Metz, 80000 Amiens", site:"https://www.rousselleautoecole.com/"},
+  {id:41, nom:"ECF Formation Professionnelle Amiens", tel:"03 22 67 10 88", ville:"Amiens", dpt:"80", adresse:"ZI Nord Rue de Vaux, 80000 Amiens", site:""},
+  {id:42, nom:"Auto Ecole DSF", tel:"03 23 67 63 63", ville:"Saint-Quentin", dpt:"02", adresse:"10 rue du Général Leclerc, 02100 Saint-Quentin", site:""},
+  {id:43, nom:"Auto-Ecole Bertelli", tel:"03 23 64 25 66", ville:"Saint-Quentin", dpt:"02", adresse:"7 rue d'Isle, 02100 Saint-Quentin", site:""},
+  {id:44, nom:"EFCT Conduite", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"5 rue Bellevue, 02100 Saint-Quentin", site:"https://efct-formation.com/"},
+  {id:45, nom:"Wee Permis Saint-Quentin", tel:"03 23 65 74 67", ville:"Saint-Quentin", dpt:"02", adresse:"13 rue Raspail, 02100 Saint-Quentin", site:"https://www.weepermis.com/"},
+  {id:46, nom:"RCFT Saint-Quentin", tel:"03 23 64 11 11", ville:"Rouvroy", dpt:"02", adresse:"Avenue Abel Bardin et Charles Benoit ZI, 02100 Rouvroy", site:""},
+  {id:47, nom:"Auto-Ecole OSR", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"47 rue Antoine Lécuyer, 02100 Saint-Quentin", site:"https://www.autoecoleosr.com/"},
+  {id:48, nom:"Ecole de Conduite Lepolard", tel:"03 23 53 19 97", ville:"Soissons", dpt:"02", adresse:"38 boulevard Alexandre Dumas, 02200 Soissons", site:"http://www.ecoledeconduite-lepolard-soissons.fr/"},
+  {id:49, nom:"NEO Formation", tel:"03 23 20 25 10", ville:"Laon", dpt:"02", adresse:"02000 Laon", site:""},
+  {id:50, nom:"MJ Auto-Moto Ecole", tel:"03 64 19 88 86", ville:"Beauvais", dpt:"60", adresse:"14 Boulevard Jules Brière, 60000 Beauvais", site:"https://www.mj-auto-moto-ecole.com/"},
+  {id:51, nom:"BFM Beauvais", tel:"03 44 22 08 66", ville:"Beauvais", dpt:"60", adresse:"139 B Rue des Déportés, 60000 Beauvais", site:""},
+  {id:52, nom:"Centre de Formation Auto Moto CFAM", tel:"03 44 40 37 18", ville:"Compiègne", dpt:"60", adresse:"4 bis rue de Pierrefonds, 60200 Compiègne", site:""},
+  {id:53, nom:"ECF de Compiègne", tel:"03 44 83 20 30", ville:"Compiègne", dpt:"60", adresse:"36 rue d'Amiens, 60200 Compiègne", site:""},
+  {id:54, nom:"Auto Ecole Benko", tel:"03 44 24 58 58", ville:"Creil", dpt:"60", adresse:"8 rue Blaise Pascal, 60100 Creil", site:""}
+];
+
+const STATE_KEY = 'crm-moto-7h-v2';
+const STATUS = {
+  not_contacted: "Non contacté",
+  called: "Appelé",
+  replied: "A répondu",
+  interested: "Intéressé",
+  not_interested: "Pas intéressé",
+  no_answer: "Ne répond pas",
+  wrong_number: "Faux numéro",
+  rdv_pris: "RDV pris"
+};
+
+let state = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
+let openId = null;
+
+function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+function get(id) { return state[id] || { status: 'not_contacted', note: '', price: '' }; }
+function set(id, patch) {
+  state[id] = { ...get(id), ...patch, updatedAt: new Date().toISOString() };
+  save();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderCard(c) {
+  const e = get(c.id);
+  const s = e.status || 'not_contacted';
+  const isOpen = openId === c.id;
+
+  let statusButtons = '';
+  for (const [key, label] of Object.entries(STATUS)) {
+    statusButtons += `<button class="${s === key ? 'active' : ''}" onclick="event.stopPropagation(); setStatus(${c.id},'${key}')">${label}</button>`;
+  }
+
+  const siteHtml = c.site ? `<a class="site-link" href="${esc(c.site)}" target="_blank" rel="noopener">Voir le site web</a>` : '';
+  const lastCall = e.lastCall ? `<div class="call-info">Dernier appel : ${new Date(e.lastCall).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>` : '';
+
+  return `
+    <div class="card ${isOpen ? 'open' : ''}" data-id="${c.id}" data-dpt="${c.dpt}">
+      <div class="card-top" onclick="toggleCard(${c.id})">
+        <div class="card-info">
+          <div class="card-name">${esc(c.nom)}</div>
+          <div class="card-location">${esc(c.ville)} (${c.dpt})</div>
+          ${c.adresse ? `<div class="card-address">${esc(c.adresse)}</div>` : ''}
+        </div>
+        <span class="badge ${s}">${STATUS[s] || s}</span>
+      </div>
+      <div class="card-actions">
+        <button class="call-btn" onclick="event.stopPropagation(); callSchool(${c.id})">
+          <span>📞</span> Appeler
+        </button>
+        <button class="status-btn" onclick="event.stopPropagation(); toggleCard(${c.id})">
+          <span>📋</span> Statut
+        </button>
+        <button class="note-btn" onclick="event.stopPropagation(); toggleCard(${c.id})">
+          <span>✏️</span> Notes
+        </button>
+      </div>
+      <div class="card-expanded">
+        <div class="status-picker">${statusButtons}</div>
+        <textarea class="note-area" placeholder="Notes (tarif, dispo, infos…)" oninput="saveNote(${c.id}, this.value)">${esc(e.note || '')}</textarea>
+        ${siteHtml}
+        ${lastCall}
+      </div>
+    </div>
+  `;
+}
+
+function toggleCard(id) {
+  openId = openId === id ? null : id;
+  render();
+}
+
+function callSchool(id) {
+  const c = CONTACTS.find(x => x.id === id);
+  if (!c) return;
+  set(id, { status: get(id).status === 'not_contacted' ? 'called' : get(id).status, lastCall: new Date().toISOString() });
+  window.location.href = 'tel:' + c.tel.replace(/\s/g, '');
+  render();
+  toast(`Appel vers ${c.nom}`);
+}
+
+function setStatus(id, status) {
+  set(id, { status });
+  render();
+  toast(STATUS[status]);
+}
+
+function saveNote(id, val) {
+  set(id, { note: val });
+}
+
+function stats() {
+  let called = 0, replied = 0, interested = 0;
+  for (const c of CONTACTS) {
+    const s = get(c.id).status;
+    if (s === 'called') called++;
+    if (s === 'replied') replied++;
+    if (s === 'interested' || s === 'rdv_pris') interested++;
+  }
+  document.getElementById('s-called').textContent = called;
+  document.getElementById('s-replied').textContent = replied;
+  document.getElementById('s-interested').textContent = interested;
+}
+
+function filter() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+  const fs = document.getElementById('filter-status').value;
+  const fz = document.getElementById('filter-zone').value;
+  document.querySelectorAll('.card').forEach(card => {
+    const c = CONTACTS.find(x => x.id === Number(card.dataset.id));
+    const e = get(c.id);
+    const text = (c.nom + ' ' + c.ville + ' ' + c.adresse).toLowerCase();
+    let show = true;
+    if (q && !text.includes(q)) show = false;
+    if (fz && c.dpt !== fz) show = false;
+    if (fs && (e.status || 'not_contacted') !== fs) show = false;
+    card.style.display = show ? '' : 'none';
+  });
+  const visible = document.querySelectorAll('.card[style=""],.card:not([style])').length;
+  document.getElementById('empty-msg').style.display = visible === 0 ? '' : 'none';
+}
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = CONTACTS.map(renderCard).join('') + '<div id="empty-msg" class="empty" style="display:none">Aucun résultat</div>';
+  stats();
+  filter();
+}
+
+function resetState() {
+  if (!confirm("Effacer tous les statuts et notes ?")) return;
+  state = {};
+  save();
+  openId = null;
+  render();
+  toast("Réinitialisé");
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  render();
+  document.getElementById('search').addEventListener('input', filter);
+  document.getElementById('filter-status').addEventListener('change', filter);
+  document.getElementById('filter-zone').addEventListener('change', filter);
+});
+</script>
+</body>
+</html>
