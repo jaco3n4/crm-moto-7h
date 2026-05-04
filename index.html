@@ -280,17 +280,17 @@
 
 <div class="header">
   <h1>Formation 7h Moto</h1>
-  <div class="subtitle" id="subtitle">73 auto-écoles · Nord &amp; Sud</div>
+  <div class="subtitle" id="subtitle">87 auto-écoles · Nord &amp; Sud</div>
 </div>
 
 <div class="zone-toggle" id="zone-toggle">
-  <button class="active" data-zone="">Tout (73)</button>
-  <button data-zone="nord">Nord (54)</button>
-  <button data-zone="sud">Sud (19)</button>
+  <button class="active" data-zone="">Tout (87)</button>
+  <button data-zone="nord">Nord (61)</button>
+  <button data-zone="sud">Sud (26)</button>
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="val" id="s-total">73</div><div class="lbl">Total</div></div>
+  <div class="stat"><div class="val" id="s-total">87</div><div class="lbl">Total</div></div>
   <div class="stat purple"><div class="val" id="s-called">0</div><div class="lbl">Appelés</div></div>
   <div class="stat green"><div class="val" id="s-replied">0</div><div class="lbl">Répondu</div></div>
   <div class="stat blue"><div class="val" id="s-interested">0</div><div class="lbl">Intéressé</div></div>
@@ -381,6 +381,13 @@ const CONTACTS = [
   {id:52, nom:"Centre de Formation Auto Moto CFAM", tel:"03 44 40 37 18", ville:"Compiègne", dpt:"60", adresse:"4 bis rue de Pierrefonds, 60200 Compiègne", site:"", zone:"nord"},
   {id:53, nom:"ECF de Compiègne", tel:"03 44 83 20 30", ville:"Compiègne", dpt:"60", adresse:"36 rue d'Amiens, 60200 Compiègne", site:"", zone:"nord"},
   {id:54, nom:"Auto Ecole Benko", tel:"03 44 24 58 58", ville:"Creil", dpt:"60", adresse:"8 rue Blaise Pascal, 60100 Creil", site:"", zone:"nord"},
+  {id:74, nom:"Auto Moto Ecole Duperray", tel:"03 24 33 22 46", ville:"Charleville-Mézières", dpt:"08", adresse:"33 Cours Aristide Briand, 08000 Charleville-Mézières", site:"", zone:"nord"},
+  {id:75, nom:"Auto Ecole Dubois Crancé", tel:"03 24 33 20 95", ville:"Charleville-Mézières", dpt:"08", adresse:"63 rue Dubois-Crancé, 08000 Charleville-Mézières", site:"", zone:"nord"},
+  {id:76, nom:"Auto Moto Ecole Turenne", tel:"03 24 27 53 67", ville:"Sedan", dpt:"08", adresse:"31 Avenue du Maréchal Leclerc, 08200 Sedan", site:"", zone:"nord"},
+  {id:77, nom:"Auto Ecole Montlhéry", tel:"03 24 38 53 26", ville:"Rethel", dpt:"08", adresse:"7 Rue Boucher de Perthes, 08300 Rethel", site:"https://www.auto-ecole-montlhery.fr/", zone:"nord"},
+  {id:78, nom:"Auto Moto Ecole Dellière", tel:"03 24 38 40 81", ville:"Rethel", dpt:"08", adresse:"7 rue du Docteur Gobinet, 08300 Rethel", site:"", zone:"nord"},
+  {id:79, nom:"Avenir Formation", tel:"03 29 86 14 88", ville:"Verdun", dpt:"55", adresse:"16 avenue Douaumont, 55100 Verdun", site:"https://www.autoecole-avenir-formation.com/", zone:"nord"},
+  {id:80, nom:"Auto Ecole Ducat", tel:"03 29 79 07 28", ville:"Bar-le-Duc", dpt:"55", adresse:"15 Rue de Sébastopol, 55000 Bar-le-Duc", site:"https://autoecole-barleduc.fr/", zone:"nord"},
 
   // ===== ZONE SUD (Reims → Paris et au-delà) =====
   {id:55, nom:"Auto-Ecole de l'Europe", tel:"03 25 81 18 18", ville:"Troyes", dpt:"10", adresse:"9 Rond-Point de l'Europe, 10000 Troyes", site:"https://auto-ecole-europe.fr/", zone:"sud"},
@@ -401,13 +408,22 @@ const CONTACTS = [
   {id:70, nom:"Auto-Moto-École Paris 15", tel:"01 45 32 85 24", ville:"Paris 15", dpt:"75", adresse:"4 rue Dombasle, 75015 Paris", site:"https://paris15auto-moto.com/", zone:"sud"},
   {id:71, nom:"Zebra Moto École", tel:"01 42 28 51 50", ville:"Paris 11", dpt:"75", adresse:"70 boulevard Beaumarchais, 75011 Paris", site:"https://www.zebra.fr/", zone:"sud"},
   {id:72, nom:"Moto Team 91", tel:"01 69 80 84 58", ville:"Montlhéry", dpt:"91", adresse:"73 bis Route d'Orléans, 91310 Montlhéry", site:"https://www.mototeam91.com/", zone:"sud"},
-  {id:73, nom:"Auto-école du Centre", tel:"01 84 19 42 84", ville:"Boulogne-Billancourt", dpt:"92", adresse:"86 boulevard de la République, 92100 Boulogne-Billancourt", site:"https://www.autoecolecettac.com/", zone:"sud"}
+  {id:73, nom:"Auto-école du Centre", tel:"01 84 19 42 84", ville:"Boulogne-Billancourt", dpt:"92", adresse:"86 boulevard de la République, 92100 Boulogne-Billancourt", site:"https://www.autoecolecettac.com/", zone:"sud"},
+  {id:81, nom:"Auto Ecole Saint-Ex", tel:"03 25 56 31 98", ville:"Saint-Dizier", dpt:"52", adresse:"3 Place de l'Europe, 52100 Saint-Dizier", site:"https://autoecole-saintex.com/", zone:"sud"},
+  {id:82, nom:"Auto Ecole Saint Eloi", tel:"03 25 05 07 64", ville:"Saint-Dizier", dpt:"52", adresse:"47 rue de Vergy, 52100 Saint-Dizier", site:"https://www.autoecole-sainteloi.fr/", zone:"sud"},
+  {id:83, nom:"Auto Ecole Buffet", tel:"03 25 03 03 47", ville:"Chaumont", dpt:"52", adresse:"2 Rue Victor Mariotte, 52000 Chaumont", site:"", zone:"sud"},
+  {id:84, nom:"Ecole de Conduite La Fontaine", tel:"03 23 83 26 81", ville:"Château-Thierry", dpt:"02", adresse:"76 rue Carnot, 02400 Château-Thierry", site:"", zone:"sud"},
+  {id:85, nom:"Auto Moto Ecole Tassigny", tel:"01 64 03 01 30", ville:"Coulommiers", dpt:"77", adresse:"14 Voie Georges Pompidou, 77120 Coulommiers", site:"https://auto-ecole-tassigny.fr/", zone:"sud"},
+  {id:86, nom:"Alizé Auto-école", tel:"09 67 74 28 78", ville:"Provins", dpt:"77", adresse:"23 rue Hugues le Grand, 77160 Provins", site:"https://automotoecolealizeprovins.com/", zone:"sud"},
+  {id:87, nom:"Auto-Ecole Pierrette", tel:"03 86 65 68 11", ville:"Sens", dpt:"89", adresse:"2 Boulevard Winston Churchill, 89100 Sens", site:"", zone:"sud"}
 ];
 
 const DEPTS = {
-  "02":"Aisne (02)", "10":"Aube (10)", "51":"Marne (51)", "59":"Nord (59)",
-  "60":"Oise (60)", "62":"Pas-de-Calais (62)", "75":"Paris (75)", "77":"Seine-et-Marne (77)",
-  "80":"Somme (80)", "91":"Essonne (91)", "92":"Hauts-de-Seine (92)", "95":"Val-d'Oise (95)"
+  "02":"Aisne (02)", "08":"Ardennes (08)", "10":"Aube (10)", "51":"Marne (51)",
+  "52":"Haute-Marne (52)", "55":"Meuse (55)", "59":"Nord (59)", "60":"Oise (60)",
+  "62":"Pas-de-Calais (62)", "75":"Paris (75)", "77":"Seine-et-Marne (77)",
+  "80":"Somme (80)", "89":"Yonne (89)", "91":"Essonne (91)", "92":"Hauts-de-Seine (92)",
+  "95":"Val-d'Oise (95)"
 };
 
 const STATE_KEY = 'crm-moto-7h-v2';
