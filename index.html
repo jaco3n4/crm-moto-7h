@@ -701,13 +701,13 @@ async function handleSync() {
   btn.classList.add('syncing');
   btn.textContent = '⟳ Sync…';
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Fetch ' + res.status);
-    const remote = await res.json();
+    const res = await fetch(url, { redirect: 'follow' });
+    const remote = res.ok ? await res.json() : {};
     const merged = mergeStates(state, remote);
     state = merged;
     save();
-    await fetch(url, { method: 'POST', headers: {'Content-Type': 'text/plain'}, body: JSON.stringify(merged) });
+    const payload = JSON.stringify(merged);
+    await fetch(url, { method: 'POST', mode: 'no-cors', body: payload });
     btn.classList.remove('syncing');
     btn.classList.add('ok');
     btn.textContent = '✓ OK';
@@ -718,7 +718,7 @@ async function handleSync() {
     btn.classList.remove('syncing');
     btn.classList.add('err');
     btn.textContent = '✕ Erreur';
-    toast('Erreur sync');
+    toast('Erreur : ' + e.message);
     console.error(e);
     setTimeout(() => { btn.classList.remove('err'); btn.textContent = '⟳ Sync'; }, 3000);
   }
