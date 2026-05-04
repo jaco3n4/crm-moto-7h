@@ -26,6 +26,29 @@
   .header h1 { font-size: 17px; font-weight: 700; }
   .header .subtitle { font-size: 12px; color: #6b7280; margin-top: 2px; }
 
+  .zone-toggle {
+    display: flex;
+    padding: 12px 16px 0;
+    gap: 0;
+  }
+  .zone-toggle button {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.15s;
+  }
+  .zone-toggle button:first-child { border-radius: 10px 0 0 10px; }
+  .zone-toggle button:last-child { border-radius: 0 10px 10px 0; }
+  .zone-toggle button:not(:first-child) { border-left: none; }
+  .zone-toggle button.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .zone-toggle button.active + button { border-left-color: #2563eb; }
+
   .stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -257,11 +280,17 @@
 
 <div class="header">
   <h1>Formation 7h Moto</h1>
-  <div class="subtitle" id="subtitle">54 auto-ecoles · Nord de la France</div>
+  <div class="subtitle" id="subtitle">73 auto-écoles · Nord &amp; Sud</div>
+</div>
+
+<div class="zone-toggle" id="zone-toggle">
+  <button class="active" data-zone="">Tout (73)</button>
+  <button data-zone="nord">Nord (54)</button>
+  <button data-zone="sud">Sud (19)</button>
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="val" id="s-total">54</div><div class="lbl">Total</div></div>
+  <div class="stat"><div class="val" id="s-total">73</div><div class="lbl">Total</div></div>
   <div class="stat purple"><div class="val" id="s-called">0</div><div class="lbl">Appelés</div></div>
   <div class="stat green"><div class="val" id="s-replied">0</div><div class="lbl">Répondu</div></div>
   <div class="stat blue"><div class="val" id="s-interested">0</div><div class="lbl">Intéressé</div></div>
@@ -281,14 +310,8 @@
       <option value="wrong_number">Faux numéro</option>
       <option value="rdv_pris">RDV pris</option>
     </select>
-    <select id="filter-zone">
+    <select id="filter-dept">
       <option value="">Tous depts</option>
-      <option value="51">Marne (51)</option>
-      <option value="59">Nord (59)</option>
-      <option value="62">Pas-de-Calais (62)</option>
-      <option value="80">Somme (80)</option>
-      <option value="02">Aisne (02)</option>
-      <option value="60">Oise (60)</option>
     </select>
   </div>
 </div>
@@ -303,61 +326,89 @@
 
 <script>
 const CONTACTS = [
-  {id:1, nom:"Auto-Ecole du Jard", tel:"03 26 07 25 87", ville:"Reims", dpt:"51", adresse:"72 rue du Jard, 51100 Reims", site:"https://www.autoecole-dujard.com/"},
-  {id:2, nom:"Auto-Ecole Petit", tel:"03 26 84 11 33", ville:"Reims", dpt:"51", adresse:"246 bis avenue de Laon, 51100 Reims", site:""},
-  {id:3, nom:"Marius Formation", tel:"03 26 07 09 25", ville:"Reims", dpt:"51", adresse:"41 rue de Verdun, 51100 Reims", site:""},
-  {id:4, nom:"Auto-Ecole Pommery", tel:"03 26 07 44 00", ville:"Reims", dpt:"51", adresse:"74 boulevard Pommery, 51100 Reims", site:""},
-  {id:5, nom:"Auto-Ecole des Sacres", tel:"03 52 45 09 32", ville:"Reims", dpt:"51", adresse:"6 rue du Barbâtre, 51100 Reims", site:"https://www.permis-reims.fr/"},
-  {id:6, nom:"Auto-Ecole Tissier", tel:"03 26 09 63 12", ville:"Reims", dpt:"51", adresse:"3 ter Avenue Clémenceau, 51100 Reims", site:"https://www.autoecole-tissier.com/"},
-  {id:7, nom:"Auto-Ecole Fausten", tel:"03 26 50 85 85", ville:"Reims", dpt:"51", adresse:"4 Place Martyrs de la Résistance, 51100 Reims", site:"https://autoecolefausten.com/"},
-  {id:8, nom:"Auto-Ecole Hémicycle Centre", tel:"03 26 68 32 88", ville:"Châlons-en-Champagne", dpt:"51", adresse:"15 Rue Saint Dominique, 51000 Châlons-en-Champagne", site:""},
-  {id:9, nom:"Pilote Auto Ecole", tel:"03 26 64 10 14", ville:"Châlons-en-Champagne", dpt:"51", adresse:"47 Rue Carnot, 51000 Châlons-en-Champagne", site:""},
-  {id:10, nom:"Auto-école des Belvas", tel:"03 26 32 44 10", ville:"Épernay", dpt:"51", adresse:"12 rue Eugène Mercier, 51200 Épernay", site:"https://www.auto-ecole-belvas.fr/"},
-  {id:11, nom:"Auto-école Malakoff", tel:"03 26 54 40 49", ville:"Épernay", dpt:"51", adresse:"6 place Malakoff, 51200 Épernay", site:""},
-  {id:12, nom:"ECF Fauquet Hervé", tel:"03 20 74 55 70", ville:"Lille", dpt:"59", adresse:"17 rue Jean Sans Peur, 59000 Lille", site:""},
-  {id:13, nom:"Lille Conduite Métropole", tel:"03 20 42 97 06", ville:"Lille", dpt:"59", adresse:"159 rue du Faubourg de Roubaix, 59000 Lille", site:"https://www.lille-conduite-metropole.fr/"},
-  {id:14, nom:"Ozone Formation La Madeleine", tel:"03 20 13 01 23", ville:"La Madeleine", dpt:"59", adresse:"44 rue du Général de Gaulle, 59110 La Madeleine", site:"https://www.ozone-formation.com/"},
-  {id:15, nom:"Ozone Formation Lesquin", tel:"03 20 85 73 09", ville:"Lesquin", dpt:"59", adresse:"1 place Haine Saint Pierre, 59810 Lesquin", site:"https://www.ozone-formation.com/"},
-  {id:16, nom:"Ozone Formation Roncq", tel:"03 62 57 48 10", ville:"Roncq", dpt:"59", adresse:"305 rue de Lille, 59223 Roncq", site:"https://www.ozone-formation.com/"},
-  {id:17, nom:"Auto Moto Ecole du Château", tel:"03 20 56 37 91", ville:"Villeneuve-d'Ascq", dpt:"59", adresse:"196 Rue Jules Guesde, 59650 Villeneuve-d'Ascq", site:""},
-  {id:18, nom:"Jouffroy Formation Roubaix", tel:"03 20 56 47 50", ville:"Roubaix", dpt:"59", adresse:"122 Rue de Tourcoing, 59100 Roubaix", site:"https://www.jouffroy-formation.com/"},
-  {id:19, nom:"Ecole de Conduite Le Pallec", tel:"03 20 76 85 45", ville:"Tourcoing", dpt:"59", adresse:"183 Rue de Gand, 59200 Tourcoing", site:"https://ecole-conduite-lepallec.com/"},
-  {id:20, nom:"Stych Auto-École Tourcoing", tel:"03 20 27 82 97", ville:"Tourcoing", dpt:"59", adresse:"35-37 Rue Nationale, 59200 Tourcoing", site:""},
-  {id:21, nom:"Leader Conduite", tel:"03 20 36 06 85", ville:"Tourcoing", dpt:"59", adresse:"48 Rue de Tournai, 59200 Tourcoing", site:""},
-  {id:22, nom:"CER Val Gare", tel:"03 27 29 82 29", ville:"Valenciennes", dpt:"59", adresse:"26 avenue du Maréchal de Lattre de Tassigny, 59300 Valenciennes", site:"https://www.val-gare.fr/"},
-  {id:23, nom:"Auto-Ecole Lubek Douai", tel:"03 27 87 35 08", ville:"Douai", dpt:"59", adresse:"529 avenue du Maréchal Leclerc, 59500 Douai", site:"https://www.auto-ecole-lubek.com/"},
-  {id:24, nom:"ECF Douai", tel:"03 27 91 21 88", ville:"Douai", dpt:"59", adresse:"114 rue de la Mairie, 59500 Douai", site:""},
-  {id:25, nom:"Auto-école Laborde Douai", tel:"03 27 98 98 99", ville:"Douai", dpt:"59", adresse:"", site:"https://www.auto-ecole-laborde.com/"},
-  {id:26, nom:"Auto-Ecole I.C.F", tel:"03 27 83 72 39", ville:"Cambrai", dpt:"59", adresse:"12 rue des Feutriers, 59400 Cambrai", site:"https://www.auto-ecole-icf.com/"},
-  {id:27, nom:"Auto-Ecole Jean-Paul", tel:"03 27 81 15 39", ville:"Cambrai", dpt:"59", adresse:"4 place Maurice Schuman, 59400 Cambrai", site:"https://www.autoecole-jeanpaul.fr/"},
-  {id:28, nom:"Auto-école Laborde Cambrai", tel:"03 27 81 10 96", ville:"Cambrai", dpt:"59", adresse:"23 rue de Lille, 59400 Cambrai", site:"https://www.auto-ecole-laborde.com/"},
-  {id:29, nom:"Auto-École Poincaré", tel:"03 28 63 01 80", ville:"Dunkerque", dpt:"59", adresse:"9 Rue du Président Poincaré, 59140 Dunkerque", site:"https://www.poincare-autoecole.com/"},
-  {id:30, nom:"City'Zen Gael Lens", tel:"09 83 86 30 81", ville:"Lens", dpt:"62", adresse:"3 Avenue de Varsovie, 62300 Lens", site:"https://www.city-zen-nord.fr/"},
-  {id:31, nom:"RCFT Arras", tel:"03 21 57 70 97", ville:"Arras", dpt:"62", adresse:"Rue Hanz Geiger ZI Est, 62000 Arras", site:""},
-  {id:32, nom:"Centre de Formation RCFT Béthune", tel:"03 21 57 70 97", ville:"Béthune", dpt:"62", adresse:"495 rue Franklin Delano Roosevelt, 62400 Béthune", site:""},
-  {id:33, nom:"City'Zen Gael Béthune", tel:"09 83 86 31 74", ville:"Béthune", dpt:"62", adresse:"31 rue Eugène Haynaut, 62400 Béthune", site:"https://www.city-zen-nord.fr/"},
-  {id:34, nom:"Auto-Ecole Sylviane", tel:"03 21 68 94 05", ville:"Béthune", dpt:"62", adresse:"638 Rue de Lille, 62400 Béthune", site:""},
-  {id:35, nom:"CER Devemy", tel:"03 21 88 80 81", ville:"Saint-Omer", dpt:"62", adresse:"91 Rue de Calais, 62500 Saint-Omer", site:""},
-  {id:36, nom:"ECA Ecole de Conduite Audomaroise", tel:"09 83 52 00 72", ville:"Saint-Omer", dpt:"62", adresse:"12 rue d'Arras, 62500 Saint-Omer", site:"https://www.eca-autoecole.fr/"},
-  {id:37, nom:"Fun Conduite Calais", tel:"03 21 17 44 78", ville:"Calais", dpt:"62", adresse:"Chemin des Régniers, 62100 Calais", site:"https://www.funconduite-calais.fr/"},
-  {id:38, nom:"Auto-école des Victoires", tel:"03 21 31 58 34", ville:"Boulogne-sur-Mer", dpt:"62", adresse:"", site:"https://autoecoledesvictoires.fr/"},
-  {id:39, nom:"Auto-Ecole Audruicq", tel:"06 80 92 65 82", ville:"Audruicq", dpt:"62", adresse:"180 rue Edmond Dupont, 62370 Audruicq", site:"https://www.auto-ecole-daudruicq.fr/"},
-  {id:40, nom:"Rousselle Auto Ecole", tel:"03 22 92 20 76", ville:"Amiens", dpt:"80", adresse:"9 Rue de Metz, 80000 Amiens", site:"https://www.rousselleautoecole.com/"},
-  {id:41, nom:"ECF Formation Professionnelle Amiens", tel:"03 22 67 10 88", ville:"Amiens", dpt:"80", adresse:"ZI Nord Rue de Vaux, 80000 Amiens", site:""},
-  {id:42, nom:"Auto Ecole DSF", tel:"03 23 67 63 63", ville:"Saint-Quentin", dpt:"02", adresse:"10 rue du Général Leclerc, 02100 Saint-Quentin", site:""},
-  {id:43, nom:"Auto-Ecole Bertelli", tel:"03 23 64 25 66", ville:"Saint-Quentin", dpt:"02", adresse:"7 rue d'Isle, 02100 Saint-Quentin", site:""},
-  {id:44, nom:"EFCT Conduite", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"5 rue Bellevue, 02100 Saint-Quentin", site:"https://efct-formation.com/"},
-  {id:45, nom:"Wee Permis Saint-Quentin", tel:"03 23 65 74 67", ville:"Saint-Quentin", dpt:"02", adresse:"13 rue Raspail, 02100 Saint-Quentin", site:"https://www.weepermis.com/"},
-  {id:46, nom:"RCFT Saint-Quentin", tel:"03 23 64 11 11", ville:"Rouvroy", dpt:"02", adresse:"Avenue Abel Bardin et Charles Benoit ZI, 02100 Rouvroy", site:""},
-  {id:47, nom:"Auto-Ecole OSR", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"47 rue Antoine Lécuyer, 02100 Saint-Quentin", site:"https://www.autoecoleosr.com/"},
-  {id:48, nom:"Ecole de Conduite Lepolard", tel:"03 23 53 19 97", ville:"Soissons", dpt:"02", adresse:"38 boulevard Alexandre Dumas, 02200 Soissons", site:"http://www.ecoledeconduite-lepolard-soissons.fr/"},
-  {id:49, nom:"NEO Formation", tel:"03 23 20 25 10", ville:"Laon", dpt:"02", adresse:"02000 Laon", site:""},
-  {id:50, nom:"MJ Auto-Moto Ecole", tel:"03 64 19 88 86", ville:"Beauvais", dpt:"60", adresse:"14 Boulevard Jules Brière, 60000 Beauvais", site:"https://www.mj-auto-moto-ecole.com/"},
-  {id:51, nom:"BFM Beauvais", tel:"03 44 22 08 66", ville:"Beauvais", dpt:"60", adresse:"139 B Rue des Déportés, 60000 Beauvais", site:""},
-  {id:52, nom:"Centre de Formation Auto Moto CFAM", tel:"03 44 40 37 18", ville:"Compiègne", dpt:"60", adresse:"4 bis rue de Pierrefonds, 60200 Compiègne", site:""},
-  {id:53, nom:"ECF de Compiègne", tel:"03 44 83 20 30", ville:"Compiègne", dpt:"60", adresse:"36 rue d'Amiens, 60200 Compiègne", site:""},
-  {id:54, nom:"Auto Ecole Benko", tel:"03 44 24 58 58", ville:"Creil", dpt:"60", adresse:"8 rue Blaise Pascal, 60100 Creil", site:""}
+  // ===== ZONE NORD (Reims → haut de la France) =====
+  {id:1, nom:"Auto-Ecole du Jard", tel:"03 26 07 25 87", ville:"Reims", dpt:"51", adresse:"72 rue du Jard, 51100 Reims", site:"https://www.autoecole-dujard.com/", zone:"nord"},
+  {id:2, nom:"Auto-Ecole Petit", tel:"03 26 84 11 33", ville:"Reims", dpt:"51", adresse:"246 bis avenue de Laon, 51100 Reims", site:"", zone:"nord"},
+  {id:3, nom:"Marius Formation", tel:"03 26 07 09 25", ville:"Reims", dpt:"51", adresse:"41 rue de Verdun, 51100 Reims", site:"", zone:"nord"},
+  {id:4, nom:"Auto-Ecole Pommery", tel:"03 26 07 44 00", ville:"Reims", dpt:"51", adresse:"74 boulevard Pommery, 51100 Reims", site:"", zone:"nord"},
+  {id:5, nom:"Auto-Ecole des Sacres", tel:"03 52 45 09 32", ville:"Reims", dpt:"51", adresse:"6 rue du Barbâtre, 51100 Reims", site:"https://www.permis-reims.fr/", zone:"nord"},
+  {id:6, nom:"Auto-Ecole Tissier", tel:"03 26 09 63 12", ville:"Reims", dpt:"51", adresse:"3 ter Avenue Clémenceau, 51100 Reims", site:"https://www.autoecole-tissier.com/", zone:"nord"},
+  {id:7, nom:"Auto-Ecole Fausten", tel:"03 26 50 85 85", ville:"Reims", dpt:"51", adresse:"4 Place Martyrs de la Résistance, 51100 Reims", site:"https://autoecolefausten.com/", zone:"nord"},
+  {id:8, nom:"Auto-Ecole Hémicycle Centre", tel:"03 26 68 32 88", ville:"Châlons-en-Champagne", dpt:"51", adresse:"15 Rue Saint Dominique, 51000 Châlons-en-Champagne", site:"", zone:"nord"},
+  {id:9, nom:"Pilote Auto Ecole", tel:"03 26 64 10 14", ville:"Châlons-en-Champagne", dpt:"51", adresse:"47 Rue Carnot, 51000 Châlons-en-Champagne", site:"", zone:"nord"},
+  {id:10, nom:"Auto-école des Belvas", tel:"03 26 32 44 10", ville:"Épernay", dpt:"51", adresse:"12 rue Eugène Mercier, 51200 Épernay", site:"https://www.auto-ecole-belvas.fr/", zone:"nord"},
+  {id:11, nom:"Auto-école Malakoff", tel:"03 26 54 40 49", ville:"Épernay", dpt:"51", adresse:"6 place Malakoff, 51200 Épernay", site:"", zone:"nord"},
+  {id:12, nom:"ECF Fauquet Hervé", tel:"03 20 74 55 70", ville:"Lille", dpt:"59", adresse:"17 rue Jean Sans Peur, 59000 Lille", site:"", zone:"nord"},
+  {id:13, nom:"Lille Conduite Métropole", tel:"03 20 42 97 06", ville:"Lille", dpt:"59", adresse:"159 rue du Faubourg de Roubaix, 59000 Lille", site:"https://www.lille-conduite-metropole.fr/", zone:"nord"},
+  {id:14, nom:"Ozone Formation La Madeleine", tel:"03 20 13 01 23", ville:"La Madeleine", dpt:"59", adresse:"44 rue du Général de Gaulle, 59110 La Madeleine", site:"https://www.ozone-formation.com/", zone:"nord"},
+  {id:15, nom:"Ozone Formation Lesquin", tel:"03 20 85 73 09", ville:"Lesquin", dpt:"59", adresse:"1 place Haine Saint Pierre, 59810 Lesquin", site:"https://www.ozone-formation.com/", zone:"nord"},
+  {id:16, nom:"Ozone Formation Roncq", tel:"03 62 57 48 10", ville:"Roncq", dpt:"59", adresse:"305 rue de Lille, 59223 Roncq", site:"https://www.ozone-formation.com/", zone:"nord"},
+  {id:17, nom:"Auto Moto Ecole du Château", tel:"03 20 56 37 91", ville:"Villeneuve-d'Ascq", dpt:"59", adresse:"196 Rue Jules Guesde, 59650 Villeneuve-d'Ascq", site:"", zone:"nord"},
+  {id:18, nom:"Jouffroy Formation Roubaix", tel:"03 20 56 47 50", ville:"Roubaix", dpt:"59", adresse:"122 Rue de Tourcoing, 59100 Roubaix", site:"https://www.jouffroy-formation.com/", zone:"nord"},
+  {id:19, nom:"Ecole de Conduite Le Pallec", tel:"03 20 76 85 45", ville:"Tourcoing", dpt:"59", adresse:"183 Rue de Gand, 59200 Tourcoing", site:"https://ecole-conduite-lepallec.com/", zone:"nord"},
+  {id:20, nom:"Stych Auto-École Tourcoing", tel:"03 20 27 82 97", ville:"Tourcoing", dpt:"59", adresse:"35-37 Rue Nationale, 59200 Tourcoing", site:"", zone:"nord"},
+  {id:21, nom:"Leader Conduite", tel:"03 20 36 06 85", ville:"Tourcoing", dpt:"59", adresse:"48 Rue de Tournai, 59200 Tourcoing", site:"", zone:"nord"},
+  {id:22, nom:"CER Val Gare", tel:"03 27 29 82 29", ville:"Valenciennes", dpt:"59", adresse:"26 avenue du Maréchal de Lattre de Tassigny, 59300 Valenciennes", site:"https://www.val-gare.fr/", zone:"nord"},
+  {id:23, nom:"Auto-Ecole Lubek Douai", tel:"03 27 87 35 08", ville:"Douai", dpt:"59", adresse:"529 avenue du Maréchal Leclerc, 59500 Douai", site:"https://www.auto-ecole-lubek.com/", zone:"nord"},
+  {id:24, nom:"ECF Douai", tel:"03 27 91 21 88", ville:"Douai", dpt:"59", adresse:"114 rue de la Mairie, 59500 Douai", site:"", zone:"nord"},
+  {id:25, nom:"Auto-école Laborde Douai", tel:"03 27 98 98 99", ville:"Douai", dpt:"59", adresse:"", site:"https://www.auto-ecole-laborde.com/", zone:"nord"},
+  {id:26, nom:"Auto-Ecole I.C.F", tel:"03 27 83 72 39", ville:"Cambrai", dpt:"59", adresse:"12 rue des Feutriers, 59400 Cambrai", site:"https://www.auto-ecole-icf.com/", zone:"nord"},
+  {id:27, nom:"Auto-Ecole Jean-Paul", tel:"03 27 81 15 39", ville:"Cambrai", dpt:"59", adresse:"4 place Maurice Schuman, 59400 Cambrai", site:"https://www.autoecole-jeanpaul.fr/", zone:"nord"},
+  {id:28, nom:"Auto-école Laborde Cambrai", tel:"03 27 81 10 96", ville:"Cambrai", dpt:"59", adresse:"23 rue de Lille, 59400 Cambrai", site:"https://www.auto-ecole-laborde.com/", zone:"nord"},
+  {id:29, nom:"Auto-École Poincaré", tel:"03 28 63 01 80", ville:"Dunkerque", dpt:"59", adresse:"9 Rue du Président Poincaré, 59140 Dunkerque", site:"https://www.poincare-autoecole.com/", zone:"nord"},
+  {id:30, nom:"City'Zen Gael Lens", tel:"09 83 86 30 81", ville:"Lens", dpt:"62", adresse:"3 Avenue de Varsovie, 62300 Lens", site:"https://www.city-zen-nord.fr/", zone:"nord"},
+  {id:31, nom:"RCFT Arras", tel:"03 21 57 70 97", ville:"Arras", dpt:"62", adresse:"Rue Hanz Geiger ZI Est, 62000 Arras", site:"", zone:"nord"},
+  {id:32, nom:"Centre de Formation RCFT Béthune", tel:"03 21 57 70 97", ville:"Béthune", dpt:"62", adresse:"495 rue Franklin Delano Roosevelt, 62400 Béthune", site:"", zone:"nord"},
+  {id:33, nom:"City'Zen Gael Béthune", tel:"09 83 86 31 74", ville:"Béthune", dpt:"62", adresse:"31 rue Eugène Haynaut, 62400 Béthune", site:"https://www.city-zen-nord.fr/", zone:"nord"},
+  {id:34, nom:"Auto-Ecole Sylviane", tel:"03 21 68 94 05", ville:"Béthune", dpt:"62", adresse:"638 Rue de Lille, 62400 Béthune", site:"", zone:"nord"},
+  {id:35, nom:"CER Devemy", tel:"03 21 88 80 81", ville:"Saint-Omer", dpt:"62", adresse:"91 Rue de Calais, 62500 Saint-Omer", site:"", zone:"nord"},
+  {id:36, nom:"ECA Ecole de Conduite Audomaroise", tel:"09 83 52 00 72", ville:"Saint-Omer", dpt:"62", adresse:"12 rue d'Arras, 62500 Saint-Omer", site:"https://www.eca-autoecole.fr/", zone:"nord"},
+  {id:37, nom:"Fun Conduite Calais", tel:"03 21 17 44 78", ville:"Calais", dpt:"62", adresse:"Chemin des Régniers, 62100 Calais", site:"https://www.funconduite-calais.fr/", zone:"nord"},
+  {id:38, nom:"Auto-école des Victoires", tel:"03 21 31 58 34", ville:"Boulogne-sur-Mer", dpt:"62", adresse:"", site:"https://autoecoledesvictoires.fr/", zone:"nord"},
+  {id:39, nom:"Auto-Ecole Audruicq", tel:"06 80 92 65 82", ville:"Audruicq", dpt:"62", adresse:"180 rue Edmond Dupont, 62370 Audruicq", site:"https://www.auto-ecole-daudruicq.fr/", zone:"nord"},
+  {id:40, nom:"Rousselle Auto Ecole", tel:"03 22 92 20 76", ville:"Amiens", dpt:"80", adresse:"9 Rue de Metz, 80000 Amiens", site:"https://www.rousselleautoecole.com/", zone:"nord"},
+  {id:41, nom:"ECF Formation Professionnelle Amiens", tel:"03 22 67 10 88", ville:"Amiens", dpt:"80", adresse:"ZI Nord Rue de Vaux, 80000 Amiens", site:"", zone:"nord"},
+  {id:42, nom:"Auto Ecole DSF", tel:"03 23 67 63 63", ville:"Saint-Quentin", dpt:"02", adresse:"10 rue du Général Leclerc, 02100 Saint-Quentin", site:"", zone:"nord"},
+  {id:43, nom:"Auto-Ecole Bertelli", tel:"03 23 64 25 66", ville:"Saint-Quentin", dpt:"02", adresse:"7 rue d'Isle, 02100 Saint-Quentin", site:"", zone:"nord"},
+  {id:44, nom:"EFCT Conduite", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"5 rue Bellevue, 02100 Saint-Quentin", site:"https://efct-formation.com/", zone:"nord"},
+  {id:45, nom:"Wee Permis Saint-Quentin", tel:"03 23 65 74 67", ville:"Saint-Quentin", dpt:"02", adresse:"13 rue Raspail, 02100 Saint-Quentin", site:"https://www.weepermis.com/", zone:"nord"},
+  {id:46, nom:"RCFT Saint-Quentin", tel:"03 23 64 11 11", ville:"Rouvroy", dpt:"02", adresse:"Avenue Abel Bardin et Charles Benoit ZI, 02100 Rouvroy", site:"", zone:"nord"},
+  {id:47, nom:"Auto-Ecole OSR", tel:"03 23 05 90 30", ville:"Saint-Quentin", dpt:"02", adresse:"47 rue Antoine Lécuyer, 02100 Saint-Quentin", site:"https://www.autoecoleosr.com/", zone:"nord"},
+  {id:48, nom:"Ecole de Conduite Lepolard", tel:"03 23 53 19 97", ville:"Soissons", dpt:"02", adresse:"38 boulevard Alexandre Dumas, 02200 Soissons", site:"http://www.ecoledeconduite-lepolard-soissons.fr/", zone:"nord"},
+  {id:49, nom:"NEO Formation", tel:"03 23 20 25 10", ville:"Laon", dpt:"02", adresse:"02000 Laon", site:"", zone:"nord"},
+  {id:50, nom:"MJ Auto-Moto Ecole", tel:"03 64 19 88 86", ville:"Beauvais", dpt:"60", adresse:"14 Boulevard Jules Brière, 60000 Beauvais", site:"https://www.mj-auto-moto-ecole.com/", zone:"nord"},
+  {id:51, nom:"BFM Beauvais", tel:"03 44 22 08 66", ville:"Beauvais", dpt:"60", adresse:"139 B Rue des Déportés, 60000 Beauvais", site:"", zone:"nord"},
+  {id:52, nom:"Centre de Formation Auto Moto CFAM", tel:"03 44 40 37 18", ville:"Compiègne", dpt:"60", adresse:"4 bis rue de Pierrefonds, 60200 Compiègne", site:"", zone:"nord"},
+  {id:53, nom:"ECF de Compiègne", tel:"03 44 83 20 30", ville:"Compiègne", dpt:"60", adresse:"36 rue d'Amiens, 60200 Compiègne", site:"", zone:"nord"},
+  {id:54, nom:"Auto Ecole Benko", tel:"03 44 24 58 58", ville:"Creil", dpt:"60", adresse:"8 rue Blaise Pascal, 60100 Creil", site:"", zone:"nord"},
+
+  // ===== ZONE SUD (Reims → Paris et au-delà) =====
+  {id:55, nom:"Auto-Ecole de l'Europe", tel:"03 25 81 18 18", ville:"Troyes", dpt:"10", adresse:"9 Rond-Point de l'Europe, 10000 Troyes", site:"https://auto-ecole-europe.fr/", zone:"sud"},
+  {id:56, nom:"Auto-Ecole Popeye", tel:"03 25 72 94 50", ville:"Troyes", dpt:"10", adresse:"6 Place de la Libération, 10000 Troyes", site:"https://popeye-troyes.fr/", zone:"sud"},
+  {id:57, nom:"Auto-Ecole des Tertres", tel:"03 51 14 10 03", ville:"Troyes", dpt:"10", adresse:"19 avenue Marie de Champagne, 10000 Troyes", site:"https://aedestertres.fr/", zone:"sud"},
+  {id:58, nom:"Auto-Ecole Allyson", tel:"03 25 73 89 16", ville:"Troyes", dpt:"10", adresse:"53 rue André Beury, 10000 Troyes", site:"https://www.ae-allyson.com/", zone:"sud"},
+  {id:59, nom:"Pilot' Auto Ecole", tel:"03 26 62 26 05", ville:"Vitry-le-François", dpt:"51", adresse:"16 rue du Pont, 51300 Vitry-le-François", site:"https://www.pilot-auto-ecole.com/", zone:"sud"},
+  {id:60, nom:"Auto-école du Marché", tel:"03 26 81 64 29", ville:"Sézanne", dpt:"51", adresse:"2 Place de la Liberté, 51120 Sézanne", site:"https://www.auto-ecole-du-marche.net/", zone:"sud"},
+  {id:61, nom:"CER Alexandre Dumas", tel:"03 23 96 19 74", ville:"Villers-Cotterêts", dpt:"02", adresse:"20 rue du Général Leclerc, 02600 Villers-Cotterêts", site:"https://www.cer-alexandre-dumas.fr/", zone:"sud"},
+  {id:62, nom:"Sud Oise Conduite", tel:"03 44 57 62 08", ville:"Chantilly", dpt:"60", adresse:"6 rue d'Orgemont, 60500 Chantilly", site:"https://sudoiseconduite.com/", zone:"sud"},
+  {id:63, nom:"CFC Chantilly", tel:"06 80 41 82 34", ville:"Chantilly", dpt:"60", adresse:"62 avenue du Maréchal Joffre, 60500 Chantilly", site:"https://www.cfc-chantilly.fr/", zone:"sud"},
+  {id:64, nom:"Auto Moto École du Vexin", tel:"01 30 32 54 55", ville:"Pontoise", dpt:"95", adresse:"4 place du Pont, 95300 Pontoise", site:"https://www.moto-ecole-vexin.fr/", zone:"sud"},
+  {id:65, nom:"IFA Auto-École", tel:"09 50 06 21 27", ville:"Cergy", dpt:"95", adresse:"18 avenue Bernard Hirsch, 95000 Cergy", site:"https://ifa-auto-ecole.fr/", zone:"sud"},
+  {id:66, nom:"Auto-Moto Collot", tel:"01 30 38 32 61", ville:"Ennery", dpt:"95", adresse:"21 chemin de la Chapelle St Antoine, 95300 Ennery", site:"https://www.collot-formation.com/", zone:"sud"},
+  {id:67, nom:"Auto-école Richemont", tel:"01 60 25 12 69", ville:"Meaux", dpt:"77", adresse:"26 Place Jean Bureau, 77100 Meaux", site:"https://www.autoecole-richemont-meaux.com/", zone:"sud"},
+  {id:68, nom:"ECF Melun Gare", tel:"01 64 39 51 91", ville:"Melun", dpt:"77", adresse:"7 Place de l'Ermitage, 77000 Melun", site:"https://www.ecf.asso.fr/agence/ecf-melun-gare", zone:"sud"},
+  {id:69, nom:"CER Bobillot", tel:"01 45 80 51 37", ville:"Paris 13", dpt:"75", adresse:"41 rue Bobillot, 75013 Paris", site:"https://www.cerbobillot.fr/", zone:"sud"},
+  {id:70, nom:"Auto-Moto-École Paris 15", tel:"01 45 32 85 24", ville:"Paris 15", dpt:"75", adresse:"4 rue Dombasle, 75015 Paris", site:"https://paris15auto-moto.com/", zone:"sud"},
+  {id:71, nom:"Zebra Moto École", tel:"01 42 28 51 50", ville:"Paris 11", dpt:"75", adresse:"70 boulevard Beaumarchais, 75011 Paris", site:"https://www.zebra.fr/", zone:"sud"},
+  {id:72, nom:"Moto Team 91", tel:"01 69 80 84 58", ville:"Montlhéry", dpt:"91", adresse:"73 bis Route d'Orléans, 91310 Montlhéry", site:"https://www.mototeam91.com/", zone:"sud"},
+  {id:73, nom:"Auto-école du Centre", tel:"01 84 19 42 84", ville:"Boulogne-Billancourt", dpt:"92", adresse:"86 boulevard de la République, 92100 Boulogne-Billancourt", site:"https://www.autoecolecettac.com/", zone:"sud"}
 ];
+
+const DEPTS = {
+  "02":"Aisne (02)", "10":"Aube (10)", "51":"Marne (51)", "59":"Nord (59)",
+  "60":"Oise (60)", "62":"Pas-de-Calais (62)", "75":"Paris (75)", "77":"Seine-et-Marne (77)",
+  "80":"Somme (80)", "91":"Essonne (91)", "92":"Hauts-de-Seine (92)", "95":"Val-d'Oise (95)"
+};
 
 const STATE_KEY = 'crm-moto-7h-v2';
 const STATUS = {
@@ -373,6 +424,7 @@ const STATUS = {
 
 let state = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
 let openId = null;
+let activeZone = '';
 
 function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
 function get(id) { return state[id] || { status: 'not_contacted', note: '', price: '' }; }
@@ -392,6 +444,18 @@ function esc(s) {
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function updateDeptFilter() {
+  const sel = document.getElementById('filter-dept');
+  const current = sel.value;
+  const depts = new Set();
+  CONTACTS.forEach(c => {
+    if (!activeZone || c.zone === activeZone) depts.add(c.dpt);
+  });
+  const sorted = [...depts].sort();
+  sel.innerHTML = '<option value="">Tous depts</option>' + sorted.map(d => `<option value="${d}">${DEPTS[d] || d}</option>`).join('');
+  if (depts.has(current)) sel.value = current;
+}
+
 function renderCard(c) {
   const e = get(c.id);
   const s = e.status || 'not_contacted';
@@ -406,7 +470,7 @@ function renderCard(c) {
   const lastCall = e.lastCall ? `<div class="call-info">Dernier appel : ${new Date(e.lastCall).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>` : '';
 
   return `
-    <div class="card ${isOpen ? 'open' : ''}" data-id="${c.id}" data-dpt="${c.dpt}">
+    <div class="card ${isOpen ? 'open' : ''}" data-id="${c.id}" data-dpt="${c.dpt}" data-zone="${c.zone}">
       <div class="card-top" onclick="toggleCard(${c.id})">
         <div class="card-info">
           <div class="card-name">${esc(c.nom)}</div>
@@ -461,13 +525,16 @@ function saveNote(id, val) {
 }
 
 function stats() {
-  let called = 0, replied = 0, interested = 0;
+  let called = 0, replied = 0, interested = 0, total = 0;
   for (const c of CONTACTS) {
+    if (activeZone && c.zone !== activeZone) continue;
+    total++;
     const s = get(c.id).status;
     if (s === 'called') called++;
     if (s === 'replied') replied++;
     if (s === 'interested' || s === 'rdv_pris') interested++;
   }
+  document.getElementById('s-total').textContent = total;
   document.getElementById('s-called').textContent = called;
   document.getElementById('s-replied').textContent = replied;
   document.getElementById('s-interested').textContent = interested;
@@ -476,24 +543,36 @@ function stats() {
 function filter() {
   const q = (document.getElementById('search').value || '').toLowerCase().trim();
   const fs = document.getElementById('filter-status').value;
-  const fz = document.getElementById('filter-zone').value;
+  const fd = document.getElementById('filter-dept').value;
   document.querySelectorAll('.card').forEach(card => {
     const c = CONTACTS.find(x => x.id === Number(card.dataset.id));
     const e = get(c.id);
     const text = (c.nom + ' ' + c.ville + ' ' + c.adresse).toLowerCase();
     let show = true;
+    if (activeZone && c.zone !== activeZone) show = false;
     if (q && !text.includes(q)) show = false;
-    if (fz && c.dpt !== fz) show = false;
+    if (fd && c.dpt !== fd) show = false;
     if (fs && (e.status || 'not_contacted') !== fs) show = false;
     card.style.display = show ? '' : 'none';
   });
-  const visible = document.querySelectorAll('.card[style=""],.card:not([style])').length;
+  const visible = document.querySelectorAll('.card:not([style*="none"])').length;
   document.getElementById('empty-msg').style.display = visible === 0 ? '' : 'none';
+}
+
+function setZone(zone) {
+  activeZone = zone;
+  document.querySelectorAll('.zone-toggle button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.zone === zone);
+  });
+  updateDeptFilter();
+  stats();
+  filter();
 }
 
 function render() {
   const list = document.getElementById('list');
   list.innerHTML = CONTACTS.map(renderCard).join('') + '<div id="empty-msg" class="empty" style="display:none">Aucun résultat</div>';
+  updateDeptFilter();
   stats();
   filter();
 }
@@ -511,7 +590,10 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   document.getElementById('search').addEventListener('input', filter);
   document.getElementById('filter-status').addEventListener('change', filter);
-  document.getElementById('filter-zone').addEventListener('change', filter);
+  document.getElementById('filter-dept').addEventListener('change', filter);
+  document.querySelectorAll('.zone-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => setZone(btn.dataset.zone));
+  });
 });
 </script>
 </body>
