@@ -280,17 +280,17 @@
 
 <div class="header">
   <h1>Formation 7h Moto</h1>
-  <div class="subtitle" id="subtitle">92 auto-écoles · Nord &amp; Sud</div>
+  <div class="subtitle" id="subtitle">120 auto-écoles · Nord &amp; Sud</div>
 </div>
 
 <div class="zone-toggle" id="zone-toggle">
-  <button class="active" data-zone="">Tout (92)</button>
-  <button data-zone="nord">Nord (66)</button>
-  <button data-zone="sud">Sud (26)</button>
+  <button class="active" data-zone="">Tout (120)</button>
+  <button data-zone="nord">Nord (79)</button>
+  <button data-zone="sud">Sud (41)</button>
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="val" id="s-total">92</div><div class="lbl">Total</div></div>
+  <div class="stat"><div class="val" id="s-total">120</div><div class="lbl">Total</div></div>
   <div class="stat purple"><div class="val" id="s-called">0</div><div class="lbl">Appelés</div></div>
   <div class="stat green"><div class="val" id="s-replied">0</div><div class="lbl">Répondu</div></div>
   <div class="stat blue"><div class="val" id="s-interested">0</div><div class="lbl">Intéressé</div></div>
@@ -393,6 +393,19 @@ const CONTACTS = [
   {id:90, nom:"Euro Permis", tel:"03 26 97 21 49", ville:"Witry-lès-Reims", dpt:"51", adresse:"17 rue Schweitzer, 51420 Witry-lès-Reims", site:"https://www.europermis.net/", zone:"nord"},
   {id:91, nom:"Auto-école Evrard", tel:"03 26 55 62 55", ville:"Épernay", dpt:"51", adresse:"1 place Robert Jean de Vogüé, 51200 Épernay", site:"https://auto-ecole-evrard.fr/", zone:"nord"},
   {id:92, nom:"Auto-Ecole du Plateau", tel:"03 23 23 19 94", ville:"Laon", dpt:"02", adresse:"3 bis place Victor Hugo, 02000 Laon", site:"", zone:"nord"},
+  {id:93, nom:"SAM Auto-Moto-École", tel:"03 20 16 37 15", ville:"Seclin", dpt:"59", adresse:"ZAC de l'Epinette, Rue de l'industrie, 59113 Seclin", site:"https://www.autoecole-sam.fr/", zone:"nord"},
+  {id:94, nom:"Auto-Moto École Azur", tel:"03 20 22 14 45", ville:"Lambersart", dpt:"59", adresse:"141 Rue du Bourg, 59130 Lambersart", site:"", zone:"nord"},
+  {id:95, nom:"Priorité Permis", tel:"03 20 96 13 92", ville:"Faches-Thumesnil", dpt:"59", adresse:"59155 Faches-Thumesnil", site:"https://www.priorite-permis.com/", zone:"nord"},
+  {id:96, nom:"Pro Conduite", tel:"03 27 64 90 03", ville:"Maubeuge", dpt:"59", adresse:"26 place des Nations, 59600 Maubeuge", site:"", zone:"nord"},
+  {id:97, nom:"Auto-Moto Ecole Fabrice", tel:"06 14 80 18 01", ville:"Hautmont", dpt:"59", adresse:"13 Rue nationale, 59330 Hautmont", site:"", zone:"nord"},
+  {id:98, nom:"Maxi Permis", tel:"06 37 91 84 40", ville:"Fourmies", dpt:"59", adresse:"59610 Fourmies", site:"", zone:"nord"},
+  {id:99, nom:"Auto-Ecole de l'Abbaye", tel:"03 21 49 60 30", ville:"Hénin-Beaumont", dpt:"62", adresse:"145 rue de l'Abbaye, 62110 Hénin-Beaumont", site:"https://www.autoecoleabbaye.fr/", zone:"nord"},
+  {id:100, nom:"Auto-École Cadet", tel:"03 44 43 24 45", ville:"Compiègne", dpt:"60", adresse:"8 Rue de Paris, 60200 Compiègne", site:"", zone:"nord"},
+  {id:101, nom:"Auto Moto Ecole Lefebvre", tel:"03 44 71 55 86", ville:"Nogent-sur-Oise", dpt:"60", adresse:"11 Place de la République, 60180 Nogent-sur-Oise", site:"https://www.autoecole-lefebvre.fr/", zone:"nord"},
+  {id:102, nom:"Auto-École Chatelin", tel:"03 22 44 07 16", ville:"Amiens", dpt:"80", adresse:"32 chaussée St Pierre, 80080 Amiens", site:"", zone:"nord"},
+  {id:103, nom:"ECF Françoise", tel:"03 22 24 26 04", ville:"Abbeville", dpt:"80", adresse:"26 chaussée du Bois, 80100 Abbeville", site:"https://www.ecf.asso.fr/Auto-ecole/Francoise/", zone:"nord"},
+  {id:104, nom:"Auto Moto Ecole ZAC", tel:"03 22 31 07 99", ville:"Abbeville", dpt:"80", adresse:"Centre Commercial Hyper U, 80100 Abbeville", site:"https://permis-abbeville.com/", zone:"nord"},
+  {id:105, nom:"ECF Avenir Péronne", tel:"03 22 84 56 36", ville:"Péronne", dpt:"80", adresse:"36 Rue Saint Sauveur, 80200 Péronne", site:"", zone:"nord"},
 
   // ===== ZONE SUD (Reims → Paris et au-delà) =====
   {id:55, nom:"Auto-Ecole de l'Europe", tel:"03 25 81 18 18", ville:"Troyes", dpt:"10", adresse:"9 Rond-Point de l'Europe, 10000 Troyes", site:"https://auto-ecole-europe.fr/", zone:"sud"},
@@ -420,7 +433,22 @@ const CONTACTS = [
   {id:84, nom:"Ecole de Conduite La Fontaine", tel:"03 23 83 26 81", ville:"Château-Thierry", dpt:"02", adresse:"76 rue Carnot, 02400 Château-Thierry", site:"", zone:"sud"},
   {id:85, nom:"Auto Moto Ecole Tassigny", tel:"01 64 03 01 30", ville:"Coulommiers", dpt:"77", adresse:"14 Voie Georges Pompidou, 77120 Coulommiers", site:"https://auto-ecole-tassigny.fr/", zone:"sud"},
   {id:86, nom:"Alizé Auto-école", tel:"09 67 74 28 78", ville:"Provins", dpt:"77", adresse:"23 rue Hugues le Grand, 77160 Provins", site:"https://automotoecolealizeprovins.com/", zone:"sud"},
-  {id:87, nom:"Auto-Ecole Pierrette", tel:"03 86 65 68 11", ville:"Sens", dpt:"89", adresse:"2 Boulevard Winston Churchill, 89100 Sens", site:"", zone:"sud"}
+  {id:87, nom:"Auto-Ecole Pierrette", tel:"03 86 65 68 11", ville:"Sens", dpt:"89", adresse:"2 Boulevard Winston Churchill, 89100 Sens", site:"", zone:"sud"},
+  {id:106, nom:"Jacquot Auto Moto", tel:"03 25 24 70 72", ville:"Romilly-sur-Seine", dpt:"10", adresse:"21 Rue Du Général De Gaulle, 10100 Romilly-sur-Seine", site:"", zone:"sud"},
+  {id:107, nom:"Conduite Nogentaise", tel:"03 25 39 60 63", ville:"Nogent-sur-Seine", dpt:"10", adresse:"10400 Nogent-sur-Seine", site:"", zone:"sud"},
+  {id:108, nom:"ECY Ecole de Conduite de l'Yonne", tel:"03 86 51 68 78", ville:"Auxerre", dpt:"89", adresse:"26 Quai de la République, 89000 Auxerre", site:"https://www.cfi-ecy.fr/", zone:"sud"},
+  {id:109, nom:"CER Dilo 89", tel:"03 86 51 01 25", ville:"Auxerre", dpt:"89", adresse:"5 Avenue Jean Moulin, 89000 Auxerre", site:"https://www.cer89.fr/", zone:"sud"},
+  {id:110, nom:"CER CEFORAS Formation", tel:"01 74 81 66 44", ville:"Meaux", dpt:"77", adresse:"57 rue Aristide Briand, 77100 Meaux", site:"https://www.cer-ceforas-formation.fr/", zone:"sud"},
+  {id:111, nom:"Auto-école Champ de Mars", tel:"01 64 28 14 72", ville:"Nemours", dpt:"77", adresse:"2 rue Berthier, 77140 Nemours", site:"https://www.autoecolechampdemars.fr/", zone:"sud"},
+  {id:112, nom:"CER Gare d'Argenteuil", tel:"01 39 80 26 98", ville:"Argenteuil", dpt:"95", adresse:"3 rue Paul Vaillant Couturier, 95100 Argenteuil", site:"https://www.cergaredargenteuil.fr/", zone:"sud"},
+  {id:113, nom:"CERMAT Formation", tel:"01 34 13 53 53", ville:"Franconville", dpt:"95", adresse:"122 Rue de la Station, 95130 Franconville", site:"http://www.cermat-formation.fr/", zone:"sud"},
+  {id:114, nom:"Driver Academy", tel:"01 78 85 50 80", ville:"Massy", dpt:"91", adresse:"29 Rue de la Division Leclerc, 91300 Massy", site:"https://www.driveracademy-autoecole.com/", zone:"sud"},
+  {id:115, nom:"CER Révolution Permis", tel:"01 89 70 90 90", ville:"Évry", dpt:"91", adresse:"14 Place de Troisdorf, 91000 Évry-Courcouronnes", site:"https://www.permisaccelere91.fr/", zone:"sud"},
+  {id:116, nom:"Moto Team 75", tel:"01 58 30 79 35", ville:"Paris 11", dpt:"75", adresse:"74 Boulevard Beaumarchais, 75011 Paris", site:"https://www.mototeam75.com/", zone:"sud"},
+  {id:117, nom:"Auto-école Franklin", tel:"01 79 63 42 68", ville:"Montreuil", dpt:"93", adresse:"10 avenue Walwein, 93100 Montreuil", site:"https://auto-ecole-franklin.fr/", zone:"sud"},
+  {id:118, nom:"Élite Auto-Moto-École", tel:"01 86 70 87 89", ville:"Montrouge", dpt:"92", adresse:"22 Rue Gabriel Péri, 92120 Montrouge", site:"https://elite-autoecole.fr/", zone:"sud"},
+  {id:119, nom:"CER Pasteur Clémenceau", tel:"01 58 47 02 25", ville:"Nanterre", dpt:"92", adresse:"1 Rue Pasteur, 92000 Nanterre", site:"https://www.cer-pasteur-clemenceau.fr/", zone:"sud"},
+  {id:120, nom:"ECF Fort de Vincennes", tel:"01 43 74 18 36", ville:"Vincennes", dpt:"94", adresse:"94300 Vincennes", site:"https://www.ecf.asso.fr/agence/ecf-fort-de-vincennes", zone:"sud"}
 ];
 
 const DEPTS = {
@@ -428,7 +456,7 @@ const DEPTS = {
   "52":"Haute-Marne (52)", "55":"Meuse (55)", "59":"Nord (59)", "60":"Oise (60)",
   "62":"Pas-de-Calais (62)", "75":"Paris (75)", "77":"Seine-et-Marne (77)",
   "80":"Somme (80)", "89":"Yonne (89)", "91":"Essonne (91)", "92":"Hauts-de-Seine (92)",
-  "95":"Val-d'Oise (95)"
+  "93":"Seine-Saint-Denis (93)", "94":"Val-de-Marne (94)", "95":"Val-d'Oise (95)"
 };
 
 const STATE_KEY = 'crm-moto-7h-v2';
