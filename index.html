@@ -293,25 +293,6 @@
   .sync-btn.syncing { opacity: 0.5; pointer-events: none; }
   .sync-btn.ok { border-color: #22c55e; color: #22c55e; }
   .sync-btn.err { border-color: #ef4444; color: #ef4444; }
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5); z-index: 200;
-    justify-content: center; align-items: center; padding: 20px;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal { background: #fff; border-radius: 14px; padding: 20px; max-width: 90vw; width: 400px; }
-  .modal h3 { font-size: 16px; margin-bottom: 10px; }
-  .modal p { font-size: 13px; color: #6b7280; margin-bottom: 14px; line-height: 1.5; }
-  .modal input {
-    width: 100%; padding: 10px 12px; border: 1px solid #d1d5db;
-    border-radius: 8px; font-size: 14px; margin-bottom: 14px; font-family: inherit;
-  }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-  .modal-actions button {
-    padding: 8px 18px; border-radius: 8px; border: 1px solid #d1d5db;
-    background: #fff; font-size: 14px; cursor: pointer; font-family: inherit; font-weight: 600;
-  }
-  .modal-actions button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
 </style>
 </head>
 <body>
@@ -518,7 +499,10 @@ let state = JSON.parse(localStorage.getItem(STATE_KEY) || '{}');
 let openId = null;
 let activeZone = '';
 
-function save() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+function save() {
+  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  debouncedPush();
+}
 function get(id) { return state[id] || { status: 'not_contacted', note: '', price: '' }; }
 function set(id, patch) {
   state[id] = { ...get(id), ...patch, updatedAt: new Date().toISOString() };
@@ -679,8 +663,16 @@ function resetState() {
 }
 
 // ===== SYNC via Google Apps Script =====
-const SYNC_URL_KEY = 'crm-sync-url';
-function getSyncUrl() { return localStorage.getItem(SYNC_URL_KEY); }
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbwE-vYJxv2s5SzCMPao_d3k6FBXYC2SKxIKL5GUU53l81gV4cFTan_7qIcNrZTECQ-G7Q/exec';
+
+let pushTimer = null;
+function debouncedPush() {
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => {
+    fetch(SYNC_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(state) })
+      .catch(e => console.error('Push:', e));
+  }, 2000);
+}
 
 function mergeStates(local, remote) {
   const merged = {};
@@ -695,24 +687,21 @@ function mergeStates(local, remote) {
 }
 
 async function handleSync() {
-  const url = getSyncUrl();
-  if (!url) { document.getElementById('sync-modal').classList.add('show'); return; }
   const btn = document.getElementById('sync-btn');
   btn.classList.add('syncing');
-  btn.textContent = '⟳ Sync…';
+  btn.textContent = '⟳ Import…';
   try {
-    const res = await fetch(url, { redirect: 'follow' });
+    const res = await fetch(SYNC_URL, { redirect: 'follow' });
     const remote = res.ok ? await res.json() : {};
-    const merged = mergeStates(state, remote);
-    state = merged;
-    save();
-    const payload = JSON.stringify(merged);
-    await fetch(url, { method: 'POST', mode: 'no-cors', body: payload });
+    if (Object.keys(remote).length) {
+      state = mergeStates(state, remote);
+      localStorage.setItem(STATE_KEY, JSON.stringify(state));
+      render();
+    }
     btn.classList.remove('syncing');
     btn.classList.add('ok');
     btn.textContent = '✓ OK';
-    render();
-    toast('Synchronisé');
+    toast('Données importées');
     setTimeout(() => { btn.classList.remove('ok'); btn.textContent = '⟳ Sync'; }, 3000);
   } catch (e) {
     btn.classList.remove('syncing');
@@ -724,35 +713,6 @@ async function handleSync() {
   }
 }
 
-function closeSyncModal() { document.getElementById('sync-modal').classList.remove('show'); }
-function saveSyncUrl() {
-  const val = document.getElementById('sync-url-input').value.trim();
-  if (!val) return;
-  localStorage.setItem(SYNC_URL_KEY, val);
-  closeSyncModal();
-  handleSync();
-}
-function clearSyncUrl() {
-  localStorage.removeItem(SYNC_URL_KEY);
-  closeSyncModal();
-  toast('URL supprimée');
-}
-
-async function autoSync() {
-  const url = getSyncUrl();
-  if (!url) return;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return;
-    const remote = await res.json();
-    if (Object.keys(remote).length) {
-      state = mergeStates(state, remote);
-      save();
-      render();
-    }
-  } catch (e) { console.error('Auto-sync:', e); }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   render();
   document.getElementById('search').addEventListener('input', filter);
@@ -761,21 +721,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.zone-toggle button').forEach(btn => {
     btn.addEventListener('click', () => setZone(btn.dataset.zone));
   });
-  autoSync();
+  handleSync();
 });
 </script>
-
-<div class="modal-overlay" id="sync-modal">
-  <div class="modal">
-    <h3>Configuration Sync</h3>
-    <p>Collez l'URL de votre Google Apps Script ici.<br>Voir les instructions dans le README du projet.</p>
-    <input type="text" id="sync-url-input" placeholder="https://script.google.com/macros/s/.../exec">
-    <div class="modal-actions">
-      <button onclick="clearSyncUrl()" style="margin-right:auto;color:#ef4444;border-color:#ef4444">Supprimer</button>
-      <button onclick="closeSyncModal()">Annuler</button>
-      <button class="primary" onclick="saveSyncUrl()">Enregistrer</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
